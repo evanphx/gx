@@ -1,0 +1,9 @@
+Set up git-update.rb to be run via the git alias system.
+
+IE.
+
+>> git config --global alias.update
+!ruby ~/git/gx/git-update.rb
+
+
+Then you can just use 'git update' anywheres! Enjoy!
