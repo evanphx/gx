@@ -75,5 +75,16 @@ module Grit
     def to_be_committed
       @git.diff_index({:cached => true, :name_only => true}, "HEAD").split("\n")
     end
+
+    def path2ref(name)
+      name.gsub %r!^refs/heads/!, ""
+    end
+
+    def merge_ref(branch)
+      repo = @git.config({}, "branch.#{branch}.remote").strip
+      ref =  @git.config({}, "branch.#{branch}.merge").strip
+      path = "#{repo}/#{path2ref(ref)}"
+      return path
+    end
   end
 end

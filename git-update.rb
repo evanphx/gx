@@ -35,8 +35,11 @@ op.parse!(ARGV)
 
 STDOUT.sync = true
 
-top = `git rev-parse --show-cdup 2>&1`.strip
+# cd to the top of this git tree. If run via git's alias
+# infrastructure, this is done for us. We do it again, just
+# to be sure.
 
+top = `git rev-parse --show-cdup 2>&1`.strip
 Dir.chdir top unless top.empty?
 
 repo = Grit::Repo.new(".")
@@ -48,9 +51,12 @@ puts "done."
 # TODO parse +out+ for details to show the user.
 
 current = repo.resolve_rev "HEAD"
-origin = repo.resolve_rev "origin"
-
 branch = repo.git.symbolic_ref({:q => true}, "HEAD").strip
+
+branch_name = branch.gsub %r!^refs/heads/!, ""
+
+origin_ref = repo.merge_ref branch_name
+origin = repo.resolve_rev origin_ref
 
 common = repo.find_ancestor(origin, current)
   
@@ -58,6 +64,7 @@ to_replay = repo.revs_between(common, current)
 to_receive = repo.revs_between(common, origin)
 
 if opts.analyze
+  puts "Automatically merging in refs from: #{origin_ref} / #{origin[0,7]}"
   puts "Closest ancestor between HEAD and origin: #{common[0,7]}"
   puts
 
@@ -68,7 +75,7 @@ if opts.analyze
 
   puts "#{to_receive.size} new commits."
   if opts.verbose
-    system "git log --pretty=oneline #{common}..origin"
+    system "git log --pretty=oneline #{common}..#{origin_ref}"
     puts
   end
 
