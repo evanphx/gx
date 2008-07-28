@@ -54,9 +54,19 @@ module Grit
       return files
     end
 
+    def Grit.rebase_dir
+      if File.directory? ".dotest"
+        return ".dotest"
+      elsif File.directory? ".git/rebase"
+        return ".git/rebase"
+      else
+        raise "No rebase info found."
+      end
+    end
+
     def am_info
       info = {}
-      File.open(".dotest/info") do |f|
+      File.open("#{Grit.rebase_dir}/info") do |f|
         f.readlines.each do |line|
           line.strip!
           break if line.empty?

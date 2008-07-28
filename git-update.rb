@@ -269,7 +269,7 @@ while $?.exitstatus != 0
       repo.git.reset({:mixed => true}, "HEAD^")
     end
 
-    system "rm -rf .dotest"
+    system "rm -rf #{Grit.rebase_dir}"
 
     exit 1
   end
