@@ -113,6 +113,7 @@ module Grit
 
     def merge_ref(branch)
       repo, ref = merge_info(branch)
+      return nil if repo.empty?
       path = "#{repo}/#{path2ref(ref)}"
       return path
     end
