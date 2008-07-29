@@ -35,14 +35,7 @@ op.parse!(ARGV)
 
 STDOUT.sync = true
 
-# cd to the top of this git tree. If run via git's alias
-# infrastructure, this is done for us. We do it again, just
-# to be sure.
-
-top = `git rev-parse --show-cdup 2>&1`.strip
-Dir.chdir top unless top.empty?
-
-repo = Grit::Repo.new(".")
+repo = Grit::Repo.current
 
 print "Fetching new commits: "
 out = repo.git.fetch({}, "2>&1")

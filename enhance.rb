@@ -3,6 +3,21 @@ require 'grit'
 
 module Grit
   class Repo
+
+    def self.current(goto=true)
+      # cd to the top of this git tree. If run via git's alias
+      # infrastructure, this is done for us. We do it again, just
+      # to be sure.
+
+      top = `git rev-parse --show-cdup 2>&1`.strip
+      if goto
+        Dir.chdir top unless top.empty?
+        return Grit::Repo.new(".")
+      else
+        return Grit::Repo.new(top)
+      end
+    end
+
     # Given +hashish+, parse it and return the hash
     # it refers to.
     #
@@ -90,11 +105,37 @@ module Grit
       name.gsub %r!^refs/heads/!, ""
     end
 
-    def merge_ref(branch)
+    def merge_info(branch)
       repo = @git.config({}, "branch.#{branch}.remote").strip
       ref =  @git.config({}, "branch.#{branch}.merge").strip
+      return [repo, ref]
+    end
+
+    def merge_ref(branch)
+      repo, ref = merge_info(branch)
       path = "#{repo}/#{path2ref(ref)}"
       return path
+    end
+
+    def merge_url(branch)
+      repo = @git.config({}, "branch.#{branch}.remote").strip
+      return "local" if repo == "."
+      
+      @git.config({}, "remote.#{repo}.url").strip
+    end
+
+    def remote_info(who, which=nil)
+      if which
+        hash, name = @git.ls_remote({}, who, which).split(/\s+/, 2)
+        return hash
+      else
+        ret = {}
+        @git.ls_remote({}, who).split("\n").each do |line|
+          hash, name = line.split(/\s+/, 2)
+          ret[name] = hash
+        end
+        return ret
+      end
     end
   end
 end
