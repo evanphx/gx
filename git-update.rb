@@ -50,7 +50,7 @@ branch_name = branch.gsub %r!^refs/heads/!, ""
 
 origin_ref = repo.merge_ref branch_name
 unless origin_ref
-  puts "Sorry, it appears you're current branch is not set setup with merge info."
+  puts "Sorry, it appears you're current branch is not setup with merge info."
   puts "Please set 'branch.#{branch_name}.remote' and 'branch.#{branch_name}.merge'"
   puts "and try again."
   exit 1
