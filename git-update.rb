@@ -67,7 +67,7 @@ co[N]flict   Set the contents of the file to contain the merged between the
   def initialize(opts)
     @opts = opts
     @repo = Grit::Repo.current
-    
+
     @current = @repo.resolve_rev "HEAD"
     @branch = @repo.git.symbolic_ref({:q => true}, "HEAD").strip
 
@@ -90,7 +90,7 @@ co[N]flict   Set the contents of the file to contain the merged between the
 
     # TODO parse +out+ for details to show the user.
   end
-    
+
   def includes_conflict_markers?(path)
     /^<<<<<<< HEAD/.match(File.read(path))
   end
@@ -284,7 +284,7 @@ co[N]flict   Set the contents of the file to contain the merged between the
       end
     end
 
-    system "git format-patch --stdout #{@common}..#{@current} > .git/update-patch"
+    system "git format-patch --full-index --stdout #{@common}..#{@current} > .git/update-patch"
     out = @repo.git.am({:rebasing => true}, " < .git/update-patch 2> /dev/null")
     while $?.exitstatus != 0
       info = @repo.am_info

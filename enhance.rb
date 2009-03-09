@@ -74,6 +74,8 @@ module Grit
         return ".dotest"
       elsif File.directory? ".git/rebase"
         return ".git/rebase"
+      elsif File.directory? ".git/rebase-apply"
+        return ".git/rebase-apply"
       else
         raise "No rebase info found."
       end
