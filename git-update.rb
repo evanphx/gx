@@ -43,7 +43,7 @@ are available to help you.
 When the conflict resolver is first started, the contents of the file
 will contain the file populated with conflict markers for you to edit.
 
-[D]iff       View the diffs between the (original version and local version) 
+[D]iff       View the diffs between the (original version and local version)
                 and (original version and remote version).
 [E]dit       Launch your editor to edit the file.
 [T]ool       Run git-mergetool on the file.
@@ -85,7 +85,7 @@ co[N]flict   Set the contents of the file to contain the merged between the
 
   def fetch
     print "Fetching new commits: "
-    out = @repo.git.fetch({}, "2>&1")
+    out = @repo.git.fetch :timeout => false
     puts "done."
 
     # TODO parse +out+ for details to show the user.
@@ -250,6 +250,12 @@ co[N]flict   Set the contents of the file to contain the merged between the
     system "rm -rf #{Grit.rebase_dir}" rescue nil
   end
 
+  def sh(cmd)
+    Grit.log cmd if Grit.debug
+    out = `#{cmd}`
+    Grit.log out if Grit.debug
+  end
+
   def port_changes
     # Switch back in time so we can re-apply commits. checkout
     # will return non-zero if there it can't be done. In that case
@@ -258,7 +264,7 @@ co[N]flict   Set the contents of the file to contain the merged between the
 
     @used_wip = false
 
-    @repo.git.checkout({:q => true}, @origin, "2>&1")
+    @repo.git.checkout({:q => true}, @origin)
     if $?.exitstatus != 0
       @repo.git.commit({:m => "'++WIP++'", :a => true})
       @used_wip = true
@@ -270,7 +276,7 @@ co[N]flict   Set the contents of the file to contain the merged between the
       @to_replay = @repo.revs_between(@common, @current)
 
       # Ok, try again.
-      error = @repo.git.checkout({:q => true}, @origin, "2>&1")
+      error = @repo.git.checkout({:q => true}, @origin)
       if $?.exitstatus != 0
         # Ok, give up.
         recover
@@ -284,8 +290,8 @@ co[N]flict   Set the contents of the file to contain the merged between the
       end
     end
 
-    system "git format-patch --full-index --stdout #{@common}..#{@current} > .git/update-patch"
-    out = @repo.git.am({:rebasing => true}, " < .git/update-patch 2> /dev/null")
+    sh "git format-patch --full-index --stdout #{@common}..#{@current} > .git/update-patch"
+    out = sh "git am --rebasing < .git/update-patch 2> /dev/null"
     while $?.exitstatus != 0
       info = @repo.am_info
       if @opts.verbose

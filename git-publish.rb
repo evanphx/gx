@@ -80,7 +80,7 @@ end
 
 print "Publishing local commits to #{url}... "
 
-out = repo.git.push({:v => true}, push_repo, push_branch, "2>&1")
+out = repo.git.push({:v => true}, push_repo, push_branch)
 if $?.exitstatus != 0
   puts "error!"
   puts "Sorry, I'm not sure what happened. Here is what git said:"
