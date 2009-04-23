@@ -129,11 +129,11 @@ module Grit
 
     def remote_info(who, which=nil)
       if which
-        hash, name = @git.ls_remote({}, who, which).split(/\s+/, 2)
+        hash, name = @git.ls_remote({:timeout => false}, who, which).split(/\s+/, 2)
         return hash
       else
         ret = {}
-        @git.ls_remote({}, who).split("\n").each do |line|
+        @git.ls_remote({:timeout => false}, who).split("\n").each do |line|
           hash, name = line.split(/\s+/, 2)
           ret[name] = hash
         end
