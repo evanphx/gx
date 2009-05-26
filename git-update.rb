@@ -264,9 +264,9 @@ co[N]flict   Set the contents of the file to contain the merged between the
 
     @used_wip = false
 
-    @repo.git.checkout({:q => true}, @origin)
-    if $?.exitstatus != 0
-      @repo.git.commit({:m => "'++WIP++'", :a => true})
+    list = @repo.git.ls_files(:m => true).split("\n")
+    if list.size > 0
+      @repo.git.commit({:m => "++WIP++", :a => true})
       @used_wip = true
 
       # Because we've introduced a new commit, we need to repoint current.
@@ -288,6 +288,8 @@ co[N]flict   Set the contents of the file to contain the merged between the
         puts error
         exit 1
       end
+    else
+      @repo.git.checkout({:q => true}, @origin)
     end
 
     sh "git format-patch --full-index --stdout #{@common}..#{@current} > .git/update-patch"
