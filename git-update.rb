@@ -95,6 +95,12 @@ co[N]flict   Set the contents of the file to contain the merged between the
     /^<<<<<<< HEAD/.match(File.read(path))
   end
 
+  def cat_file(ref, file)
+    File.open(file, "w") do |f|
+      f << @repo.git.cat_file({}, ref)
+    end
+  end
+
   def handle_unmerged(patch_info, files)
     files.each do |name, info|
       system "cp #{name} .git/with_markers"
@@ -120,15 +126,15 @@ co[N]flict   Set the contents of the file to contain the merged between the
         when ?d
           orig = ".git/diff/original/#{name}"
           FileUtils.mkdir_p File.dirname(orig)
-          @repo.git.cat_file({}, "blob", info.original, " > #{orig}")
+          cat_file info.original, orig
 
           mine = ".git/diff/mine/#{name}"
           FileUtils.mkdir_p File.dirname(mine)
-          @repo.git.cat_file({}, "blob", info.mine, " > #{mine}")
+          cat_file info.mine, mine
 
           remote = ".git/diff/remote/#{name}"
           FileUtils.mkdir_p File.dirname(remote)
-          @repo.git.cat_file({}, "blob", info.yours, " > #{remote}")
+          cat_file info.yours, remote
 
           system "cd .git/diff; diff -u original/#{name} mine/#{name}"
           system "cd .git/diff; diff -u original/#{name} remote/#{name}"
@@ -138,11 +144,11 @@ co[N]flict   Set the contents of the file to contain the merged between the
         when ?t
           system "git mergetool #{name}"
         when ?o
-          @repo.git.cat_file({}, "blob", info.original, " > #{name}")
+          cat_file info.original, name
         when ?m
-          @repo.git.cat_file({}, "blob", info.mine, " > #{name}")
+          cat_file info.mine, name
         when ?r
-          @repo.git.cat_file({}, "blob", info.yours, " > #{name}")
+          cat_file info.yours, name
         when ?n
           system "cp .git/with_markers #{name}"
         when ?p
