@@ -57,7 +57,7 @@ co[N]flict   Set the contents of the file to contain the merged between the
 [P]rompt     Launch a subshell to deal with the conflict. Simply exit
                 from the shell to continue with conflict resolution.
 [I]nfo       View information about the commit and the current file.
-[A]bort      Cancel the update all together, restore everything to before
+[A]bort      Cancel the update altogether, restore everything to before
                 the update was started.
 [C]ontinue   You're done dealing with this conflict, move on to the next one.
 [H]elp       Detail all available options, you're looking at it now.
