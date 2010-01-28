@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.dirname(__FILE__)
+require 'pathname'
+$:.unshift Pathname.new(__FILE__).realpath.dirname.to_s
 
 require 'enhance'
 require 'optparse'

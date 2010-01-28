@@ -3,7 +3,8 @@
 # TODO:
 # * Handle a conflict in a remote commit that is in a renamed file.
 
-$:.unshift File.dirname(__FILE__)
+require 'pathname'
+$:.unshift Pathname.new(__FILE__).realpath.dirname.to_s
 
 require 'enhance'
 require 'optparse'
