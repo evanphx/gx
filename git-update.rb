@@ -261,6 +261,7 @@ co[N]flict   Set the contents of the file to contain the merged between the
     Grit.log cmd if Grit.debug
     out = `#{cmd}`
     Grit.log out if Grit.debug
+    return out
   end
 
   def port_changes
@@ -283,7 +284,8 @@ co[N]flict   Set the contents of the file to contain the merged between the
       @to_replay = @repo.revs_between(@common, @current)
 
       # Ok, try again.
-      error = @repo.git.checkout({:q => true}, @origin)
+      # Use sh, since the git proxy seems to fuck up $?
+      error = sh "git checkout -q #{@origin} 2>&1"
       if $?.exitstatus != 0
         # Ok, give up.
         recover
@@ -292,11 +294,27 @@ co[N]flict   Set the contents of the file to contain the merged between the
         puts "ERROR: Sorry, 'git checkout' can't figure out how to properly switch"
         puts "the working copy. Please fix this and run 'git update' again."
         puts "Here is the error that 'git checkout' reported:"
+        puts
         puts error
+        puts
         exit 1
       end
     else
-      @repo.git.checkout({:q => true}, @origin)
+      error = sh "git checkout -q #{@origin} 2>&1"
+
+      if $?.exitstatus != 0
+        # Ok, give up.
+        recover
+
+        # Now tell the user what happened.
+        puts "ERROR: Sorry, 'git checkout' can't figure out how to properly switch"
+        puts "the working copy. Please fix this and run 'git update' again."
+        puts "Here is the error that 'git checkout' reported:"
+        puts
+        puts error
+        puts
+        exit 1
+      end
     end
 
     sh "git format-patch --full-index --stdout #{@common}..#{@current} > .git/update-patch"
