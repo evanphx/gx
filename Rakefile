@@ -17,6 +17,8 @@ Hoe.spec "gx" do
 
   developer "Evan Phoenix", "evan@fallingsnow.net"
 
+  extra_deps << ['grit', '~> 2.4']
+
   # self.rubyforge_name = 'gxx' # if different than 'gx'
 end
 
