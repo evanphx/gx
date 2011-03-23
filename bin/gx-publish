@@ -1,9 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'pathname'
-$:.unshift Pathname.new(__FILE__).realpath.dirname.to_s
 
-require 'enhance'
+require 'gx/enhance'
 require 'optparse'
 require 'ostruct'
 require 'fileutils'
@@ -34,6 +33,9 @@ op.parse!(ARGV)
 STDOUT.sync = true
 
 repo = Grit::Repo.current
+
+# Boost the timeout
+Grit::Git.git_timeout = 120
 
 current = repo.resolve_rev "HEAD"
 branch = repo.git.symbolic_ref({:q => true}, "HEAD").strip
@@ -81,7 +83,7 @@ end
 
 print "Publishing local commits to #{url}... "
 
-out = repo.git.push({:v => true}, push_repo, push_branch)
+out = repo.git.push({:v => true}, push_repo, "#{branch_name}:#{push_branch}")
 if $?.exitstatus != 0
   puts "error!"
   puts "Sorry, I'm not sure what happened. Here is what git said:"

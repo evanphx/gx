@@ -1,0 +1,10 @@
+.autotest
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/gx-publish
+bin/gx-update
+lib/gx.rb
+lib/gx/enhance.rb
+test/test_gx.rb
