@@ -87,10 +87,29 @@ co[N]flict   Set the contents of the file to contain the merged between the
 
   def fetch
     print "Fetching new commits: "
-    out = @repo.git.fetch :timeout => false
+    out = nil
+    spinner do
+      out = @repo.git.fetch :timeout => false
+    end
     puts "done."
 
     # TODO parse +out+ for details to show the user.
+  end
+
+  # from http://ruby.about.com/od/tasks/f/spinner.htm
+  def spinner(&block)
+    chars = %w{ | / - \\ }
+
+    t = Thread.new(&block)
+    while t.alive?
+      print chars[0]
+      sleep 0.1
+      print "\b"
+
+      chars.push chars.shift
+    end
+
+    t.join
   end
 
   def includes_conflict_markers?(path)
