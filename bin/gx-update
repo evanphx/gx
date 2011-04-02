@@ -21,6 +21,10 @@ op = OptionParser.new do |o|
     opts.verbose = true
   end
 
+  o.on "-c", "--compare", "Use hub's compare instead of diffstats" do
+    opts.compare = true
+  end
+
   o.on "--debug", "Show all git commands run" do
     Grit.debug = true
   end
@@ -380,7 +384,11 @@ co[N]flict   Set the contents of the file to contain the merged between the
     puts
 
     unless @opts.quiet
-      system "git diff --stat #{@common}..#{@origin}"
+      if @opts.compare
+        system "hub compare #{@common[0,7]}...#{@origin[0,7]}"
+      else
+        system "git diff --stat #{@common}..#{@origin}"
+      end
     end
 
   end
