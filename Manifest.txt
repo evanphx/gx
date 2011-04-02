@@ -7,4 +7,3 @@ bin/gx-publish
 bin/gx-update
 lib/gx.rb
 lib/gx/enhance.rb
-test/test_gx.rb
