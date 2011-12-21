@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+
+require 'pathname'
+
+require 'gx/enhance'
+
+STDOUT.sync = true
+
+repo = Grit::Repo.current
+
+head = Grit::Head.current(repo)
+
+current_branch = head.name
+
+url = ARGV.shift
+cmd = ARGV.shift || "rake"
+
+repo.git.branch({}, "gx-pull-check")
+repo.git.checkout({}, "gx-pull-check")
+
+puts "Performing pull check on '#{url}'"
+
+puts "Step 1: Apply the pull request..."
+system "hub am '#{url}'"
+
+if $?.exitstatus != 0
+  puts "Error applying the pull request, leaving you in the branch"
+  exit 1
+end
+
+puts "Step 2: run '#{cmd}'..."
+
+system cmd
+
+if $?.exitstatus != 0
+  puts "Error running test command, leaving you in the branch"
+  exit 1
+end
+
+puts "========================================="
+puts "Everything ran fine, feel free to merge the pull request!"
+
+repo.git.checkout({}, current_branch)
+repo.git.branch({:D => true}, "gx-pull-check")
+

@@ -3,6 +3,7 @@ Manifest.txt
 README.txt
 Rakefile
 bin/gx-publish
+bin/gx-pull-check
 bin/gx-update
 lib/gx.rb
 lib/gx/enhance.rb
