@@ -15,20 +15,32 @@ current_branch = head.name
 url = ARGV.shift
 cmd = ARGV.shift || "rake"
 
+puts "Performing pull check on '#{url}'"
+
+url += ".patch"
+
+patch = File.join(ENV['TMPDIR'], "pull-check-#{File.basename(url)}")
+
+puts "Step 1: Downloading the pull request..."
+system "curl -#L -o #{patch} '#{url}'"
+
+if $?.exitstatus != 0
+  puts "Error downloading #{url}"
+  exit 1
+end
+
+puts "Step 2: Apply the pull request..."
 repo.git.branch({}, "gx-pull-check")
 repo.git.checkout({}, "gx-pull-check")
 
-puts "Performing pull check on '#{url}'"
-
-puts "Step 1: Apply the pull request..."
-system "hub am '#{url}'"
+system "git am #{patch}"
 
 if $?.exitstatus != 0
   puts "Error applying the pull request, leaving you in the branch"
   exit 1
 end
 
-puts "Step 2: run '#{cmd}'..."
+puts "Step 3: run '#{cmd}'..."
 
 system cmd
 
