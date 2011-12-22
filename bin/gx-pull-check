@@ -36,6 +36,7 @@ repo.git.checkout({}, "gx-pull-check")
 system "git am #{patch}"
 
 if $?.exitstatus != 0
+  File.unlink patch
   puts "Error applying the pull request, leaving you in the branch"
   exit 1
 end
@@ -45,6 +46,7 @@ puts "Step 3: run '#{cmd}'..."
 system cmd
 
 if $?.exitstatus != 0
+  File.unlink patch
   puts "Error running test command, leaving you in the branch"
   exit 1
 end
@@ -55,3 +57,4 @@ puts "Everything ran fine, feel free to merge the pull request!"
 repo.git.checkout({}, current_branch)
 repo.git.branch({:D => true}, "gx-pull-check")
 
+File.unlink patch
