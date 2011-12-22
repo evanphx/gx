@@ -3,6 +3,7 @@
 require 'pathname'
 
 require 'gx/enhance'
+require 'digest/sha1'
 
 STDOUT.sync = true
 
@@ -19,7 +20,7 @@ puts "Performing pull check on '#{url}'"
 
 url += ".patch"
 
-patch = File.join(ENV['TMPDIR'], "pull-check-#{File.basename(url)}")
+patch = File.join ENV['TMPDIR'], "pull-check-#{Digest::SHA1.hexdigest(url)}"
 
 puts "Step 1: Downloading the pull request..."
 system "curl -#L -o #{patch} '#{url}'"
