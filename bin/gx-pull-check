@@ -16,6 +16,26 @@ current_branch = head.name
 url = ARGV.shift
 cmd = ARGV.shift || "rake"
 
+if current_branch == "gx-pull-check" and url == "done"
+  puts "Cleaning up pull-check..."
+  current_branch = File.read(".git/pull-check-origin").strip
+
+  repo.git.checkout({}, current_branch)
+  repo.git.branch({:D => true}, "gx-pull-check")
+
+  File.unlink ".git/pull-check-origin"
+
+  exit 0
+elsif current_branch == "gx-pull-check"
+  puts "Currently handling a pull check already, please finish it first."
+  exit 1
+end
+
+unless url
+  puts "Usage: gx-pull-check URL [command to test]"
+  exit 1
+end
+
 puts "Performing pull check on '#{url}'"
 
 url += ".patch"
@@ -28,6 +48,10 @@ system "curl -#L -o #{patch} '#{url}'"
 if $?.exitstatus != 0
   puts "Error downloading #{url}"
   exit 1
+end
+
+File.open ".git/pull-check-origin", "w" do |f|
+  f.puts current_branch
 end
 
 puts "Step 2: Apply the pull request..."
@@ -57,5 +81,7 @@ puts "Everything ran fine, feel free to merge the pull request!"
 
 repo.git.checkout({}, current_branch)
 repo.git.branch({:D => true}, "gx-pull-check")
+
+File.unlink ".git/pull-check-origin"
 
 File.unlink patch
